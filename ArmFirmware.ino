@@ -33,17 +33,39 @@ void setup() {
   pinMode(ENABLE_PIN, OUTPUT);
   digitalWrite(ENABLE_PIN, LOW); // Enable drivers
 
-  pinMode(LIMIT_SWITCH, INPUT_PULLUP); // "Pullup" means it's safe and doesn't need a resistor
+  pinMode(LIMIT_SWITCH,
+          INPUT_PULLUP); // "Pullup" means it's safe and doesn't need a resistor
 
   // Initial settings (same as before)
-  baseM.setMaxSpeed(2000); baseM.setAcceleration(800);
+  baseM.setMaxSpeed(2000);
+  baseM.setAcceleration(800);
   // ... (all other motors) ...
 }
 
 void loop() {
   // Check limit switch: If pressed, stop the slider immediately!
-  if (digitalRead(LIMIT_SWITCH) == LOW) {
+  // Optimized to minimize CPU cycles:
+  // 1. Only read the limit switch if the slider is currently moving.
+  // 2. Avoid redundant stop() calls by tracking if the switch has already
+  //    triggered a stop for the current movement.
+  static long lastTarget = 0;
+  static bool limitTriggered = false;
+
+  long currentTarget = sliderM.targetPosition();
+
+  // Reset the trigger if the target position changes (new movement)
+  if (currentTarget != lastTarget) {
+    limitTriggered = false;
+    lastTarget = currentTarget;
+  }
+
+  if (sliderM.distanceToGo() != 0 && !limitTriggered) {
+    if (digitalRead(LIMIT_SWITCH) == LOW) {
       sliderM.stop();
+      limitTriggered = true;
+      lastTarget =
+          sliderM.targetPosition(); // Update to the new deceleration target
+    }
   }
 
   // ... (Rest of your Jules serial logic and run() commands) ...
