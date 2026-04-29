@@ -12,8 +12,8 @@ public class RoboticArmController {
     private InputStream in;
 
     // Kinematics Constants
-    public static final double STEPS_PER_DEGREE_BASE = 168.89;
-    public static final double STEPS_PER_DEGREE_SHOULDER = 37.78;
+    public static final double STEPS_PER_DEGREE_BASE = 168.8889;
+    public static final double STEPS_PER_DEGREE_SHOULDER = 37.7778;
     // Placeholder for Slider
     public static final double STEPS_PER_MM_SLIDER = 100.0; // Assume 100 steps per mm for now
 
@@ -62,16 +62,10 @@ public class RoboticArmController {
         sendCommand(command);
 
         // Block and Wait until the Arduino returns the exact string "READY\n"
+        // Blocks indefinitely until "READY\n" is received to ensure full sync
         StringBuilder responseBuilder = new StringBuilder();
         try {
-            long startTime = System.currentTimeMillis();
             while (true) {
-                // Check timeout
-                if (System.currentTimeMillis() - startTime > 10000) {
-                    System.err.println("Timeout waiting for READY response.");
-                    return false;
-                }
-
                 if (in.available() > 0) {
                     char c = (char) in.read();
                     responseBuilder.append(c);
