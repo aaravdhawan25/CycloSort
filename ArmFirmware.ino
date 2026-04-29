@@ -15,8 +15,6 @@
 #define ELBOW_DIR 9
 #define WRIST_UD_STEP 10
 #define WRIST_UD_DIR 11
-#define WRIST_ROT_STEP 12
-#define WRIST_ROT_DIR 13
 
 // Instantiate motors
 AccelStepper baseM(1, BASE_STEP, BASE_DIR);
@@ -24,7 +22,6 @@ AccelStepper shoulderM(1, SHOULDER_STEP, SHOULDER_DIR);
 AccelStepper sliderM(1, SLIDER_STEP, SLIDER_DIR);
 AccelStepper elbowM(1, ELBOW_STEP, ELBOW_DIR);
 AccelStepper wristUDM(1, WRIST_UD_STEP, WRIST_UD_DIR);
-AccelStepper wristRotM(1, WRIST_ROT_STEP, WRIST_ROT_DIR);
 
 void setup() {
   Serial.begin(115200);
